@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"strings"
+	"strconv"
 )
 
 // package level variables
@@ -12,7 +12,7 @@ var eventName = "AI Event"
 var eventDate = "2021-10-10"
 var eventTime = "10:00 AM"
 var remainingTicket = 50
-var bookings []string
+var bookings = make([]map[string]string, 0)
 
 func main() {
 
@@ -71,19 +71,9 @@ func greetUsers() {
 func getFirstNames() []string {
 	firstNames := []string{}
 	for _, booking := range bookings {
-		var names = strings.Fields(booking)
-		firstNames = append(firstNames, names[0])
+		firstNames = append(firstNames, booking["firstName"])
 	}
 	return firstNames
-}
-
-func validateUserInput(firstName string, lastName string, email string, phoneNumber string, userTickets int) (bool, bool, bool, bool) {
-	isValidName := len(firstName) > 2 && len(lastName) > 2
-	isValidEmail := strings.Contains(email, "@") && strings.Contains(email, ".")
-	isValidPhoneNumber := len(phoneNumber) == 11
-	isValidUserTickets := userTickets > 0 && userTickets <= remainingTicket
-
-	return isValidName, isValidEmail, isValidPhoneNumber, isValidUserTickets
 }
 
 func getUserInput() (string, string, string, string, int) {
@@ -107,9 +97,19 @@ func getUserInput() (string, string, string, string, int) {
 	return firstName, lastName, email, phoneNumber, userTickets
 }
 
-func bookTickets(userTickets int, firstName string, lastName string, email string, phoneNumber string) (int, []string) {
+func bookTickets(userTickets int, firstName string, lastName string, email string, phoneNumber string) (int, []map[string]string) {
 	remainingTicket = remainingTicket - userTickets
-	bookings = append(bookings, firstName+" "+lastName)
+	// create a map for user
+
+	var userData = make(map[string]string)
+	userData["firstName"] = firstName
+	userData["lastName"] = lastName
+	userData["email"] = email
+	userData["phoneNumber"] = phoneNumber
+	userData["userTickets"] = strconv.Itoa(userTickets)
+
+	bookings = append(bookings, userData)
+	fmt.Printf("List of bookings is %v\n", bookings)
 
 	fmt.Printf("Thank you %v %v for booking %v tickets for the %v event\n", firstName, lastName, userTickets, eventName)
 	fmt.Printf("Your ticket(s) will be sent to your email: %v and phone number: %v\n", email, phoneNumber)
