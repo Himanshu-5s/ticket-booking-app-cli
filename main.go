@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"strconv"
+	"time"
 )
 
 // package level variables
@@ -12,7 +12,15 @@ var eventName = "AI Event"
 var eventDate = "2021-10-10"
 var eventTime = "10:00 AM"
 var remainingTicket = 50
-var bookings = make([]map[string]string, 0)
+var bookings = make([]userData, 0)
+
+type userData struct {
+	firstName   string
+	lastName    string
+	email       string
+	phoneNumber string
+	userTickets int
+}
 
 func main() {
 
@@ -31,6 +39,7 @@ func main() {
 		if isValidName && isValidEmail && isValidPhoneNumber && isValidUserTickets {
 			//
 			remainingTicket, bookings = bookTickets(userTickets, firstName, lastName, email, phoneNumber)
+			sendTicket(userTickets, firstName, lastName, email)
 
 			//  funtion to list all bookings for the event by their first names
 			firstNames := getFirstNames()
@@ -71,7 +80,7 @@ func greetUsers() {
 func getFirstNames() []string {
 	firstNames := []string{}
 	for _, booking := range bookings {
-		firstNames = append(firstNames, booking["firstName"])
+		firstNames = append(firstNames, booking.firstName)
 	}
 	return firstNames
 }
@@ -97,16 +106,18 @@ func getUserInput() (string, string, string, string, int) {
 	return firstName, lastName, email, phoneNumber, userTickets
 }
 
-func bookTickets(userTickets int, firstName string, lastName string, email string, phoneNumber string) (int, []map[string]string) {
+func bookTickets(userTickets int, firstName string, lastName string, email string, phoneNumber string) (int, []userData) {
 	remainingTicket = remainingTicket - userTickets
-	// create a map for user
 
-	var userData = make(map[string]string)
-	userData["firstName"] = firstName
-	userData["lastName"] = lastName
-	userData["email"] = email
-	userData["phoneNumber"] = phoneNumber
-	userData["userTickets"] = strconv.Itoa(userTickets)
+	// list of structs to store user data
+
+	var userData = userData{
+		firstName:   firstName,
+		lastName:    lastName,
+		email:       email,
+		phoneNumber: phoneNumber,
+		userTickets: userTickets,
+	}
 
 	bookings = append(bookings, userData)
 	fmt.Printf("List of bookings is %v\n", bookings)
@@ -117,4 +128,12 @@ func bookTickets(userTickets int, firstName string, lastName string, email strin
 	fmt.Println("We are happy to have you here!")
 
 	return remainingTicket, bookings
+}
+
+func sendTicket(userTickets int, firstName string, lastName string, email string) {
+	time.Sleep(10 * time.Second)
+	var ticket = fmt.Sprintf("This many %v tickets have been sent to %v %v", userTickets, firstName, lastName)
+	fmt.Println("************")
+	fmt.Printf("sending ticket: \n %v to email address %v\n", ticket, email)
+	fmt.Println("************")
 }
